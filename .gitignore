@@ -1,0 +1,19 @@
+# Python
+backend/venv/
+backend/db.sqlite3
+backend/__pycache__/
+backend/**/__pycache__/
+*.pyc
+
+# Flutter
+health_copilot/.dart_tool/
+health_copilot/.packages
+health_copilot/build/
+health_copilot/.flutter-plugins
+health_copilot/.flutter-plugins-dependencies
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.DS_Store
