@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_copilot/core/design_system/design_system.dart';
 import 'package:health_copilot/core/di/injection_container.dart';
+import 'package:health_copilot/features/appointments/presentation/view/appointments_page.dart';
+import 'package:health_copilot/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:health_copilot/features/auth/presentation/view/login_page.dart';
 import 'package:health_copilot/features/chat/presentation/cubit/chat_cubit.dart';
 import 'package:health_copilot/features/chat/presentation/widgets/chat_input.dart';
 import 'package:health_copilot/features/chat/presentation/widgets/message_bubble.dart';
@@ -41,9 +44,18 @@ class _ChatView extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(AppIcons.refresh),
+            icon: const Icon(
+              Icons.calendar_month_rounded,
+            ),
             onPressed: () =>
-                context.read<ChatCubit>().resetConversation(),
+                _navigateToAppointments(context),
+            tooltip: 'My Appointments',
+          ),
+          IconButton(
+            icon: const Icon(AppIcons.refresh),
+            onPressed: () => context
+                .read<ChatCubit>()
+                .resetConversation(),
             tooltip: 'New conversation',
           ),
         ],
@@ -65,24 +77,65 @@ class _ChatView extends StatelessWidget {
 
           return Column(
             children: [
-              Expanded(child: _MessageList(state: state)),
+              Expanded(
+                child: _MessageList(state: state),
+              ),
               if (state.hasRecommendation)
                 RecommendationCard(
                   recommendation: state.recommendation!,
                   onFindDoctor: () =>
-                      _navigateToScheduling(context, state),
+                      _navigateToScheduling(
+                    context,
+                    state,
+                  ),
                 )
               else
                 ChatInput(
-                  onSend: (text) =>
-                      context.read<ChatCubit>().sendMessage(text),
-                  enabled: state.status != ChatStatus.sending,
+                  onSend: (text) => context
+                      .read<ChatCubit>()
+                      .sendMessage(text),
+                  enabled:
+                      state.status != ChatStatus.sending,
                 ),
             ],
           );
         },
       ),
     );
+  }
+
+  void _navigateToAppointments(BuildContext context) {
+    final authCubit = context.read<AuthCubit>();
+
+    if (authCubit.state.isAuthenticated) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => const AppointmentsPage(),
+        ),
+      );
+    } else {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => BlocProvider.value(
+            value: authCubit,
+            child: LoginPage(
+              onVerified: () {
+                // Pop login + OTP, then push appointments
+                Navigator.of(context)
+                  ..pop()
+                  ..pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) =>
+                        const AppointmentsPage(),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   void _navigateToScheduling(
@@ -92,7 +145,8 @@ class _ChatView extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => DoctorListPage(
-          specialtyName: state.recommendation!.specialty,
+          specialtyName:
+              state.recommendation!.specialty,
           conversationId: state.conversationId,
           recommendation: state.recommendation!,
         ),
@@ -116,13 +170,17 @@ class _MessageList extends StatelessWidget {
       itemCount: state.messages.length +
           (state.status == ChatStatus.sending ? 1 : 0),
       itemBuilder: (context, index) {
-        if (state.status == ChatStatus.sending && index == 0) {
+        if (state.status == ChatStatus.sending &&
+            index == 0) {
           return const TypingIndicator();
         }
-        final msgIndex = state.status == ChatStatus.sending
-            ? state.messages.length - index
-            : state.messages.length - 1 - index;
-        return MessageBubble(message: state.messages[msgIndex]);
+        final msgIndex =
+            state.status == ChatStatus.sending
+                ? state.messages.length - index
+                : state.messages.length - 1 - index;
+        return MessageBubble(
+          message: state.messages[msgIndex],
+        );
       },
     );
   }

@@ -228,6 +228,17 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     serializer_class = AppointmentSerializer
     http_method_names = ['get', 'post']
 
+    def get_permissions(self):
+        if self.action == 'list':
+            return [IsAuthenticated()]
+        return super().get_permissions()
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.action == 'list' and self.request.user.is_authenticated:
+            qs = qs.filter(patient__email=self.request.user.username)
+        return qs
+
     def perform_create(self, serializer):
         appointment = serializer.save()
         time_slot = appointment.time_slot
