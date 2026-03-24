@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_copilot/core/design_system/design_system.dart';
 import 'package:health_copilot/features/appointments/presentation/view/confirmation_page.dart';
+import 'package:health_copilot/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:health_copilot/features/auth/presentation/view/patient_info_page.dart';
 import 'package:health_copilot/features/chat/domain/entities/recommendation.dart';
 import 'package:health_copilot/features/scheduling/domain/entities/doctor.dart';
 import 'package:health_copilot/features/scheduling/domain/entities/time_slot.dart';
@@ -107,12 +109,37 @@ class SlotPickerPage extends StatelessWidget {
     BuildContext context,
     TimeSlot slot,
   ) async {
+    final authCubit = context.read<AuthCubit>();
+
+    if (!authCubit.state.isAuthenticated) {
+      if (!context.mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => BlocProvider.value(
+            value: authCubit,
+            child: PatientInfoPage(
+              onVerified: () {
+                // Pop back to slot picker after auth
+                Navigator.of(context)
+                  ..pop() // OTP page
+                  ..pop(); // Patient info page
+              },
+            ),
+          ),
+        ),
+      );
+      // After returning, check if now authenticated
+      if (!authCubit.state.isAuthenticated) return;
+      if (!context.mounted) return;
+    }
+
     final cubit = context.read<SchedulingCubit>();
     final appointment = await cubit.bookAppointment(
       timeSlotId: slot.id,
       conversationId: conversationId,
       symptomsSummary: recommendation.summary,
       urgencyLevel: recommendation.urgency,
+      patientId: authCubit.state.patient!.id,
     );
 
     if (appointment != null && context.mounted) {

@@ -13,11 +13,13 @@ class AppointmentRemoteDataSource {
     required int timeSlotId,
     required String symptomsSummary,
     required String urgencyLevel,
+    int? patientId,
   }) async {
     final response =
         await _apiClient.post<Map<String, dynamic>>(
       '/copilot/appointments/',
       data: {
+        'patient': patientId,
         'conversation': conversationId,
         'doctor': doctorId,
         'time_slot': timeSlotId,

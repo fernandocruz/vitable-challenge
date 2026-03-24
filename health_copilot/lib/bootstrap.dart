@@ -10,6 +10,8 @@ import 'package:health_copilot/core/observability/observability.dart';
 Future<void> bootstrap(
   FutureOr<Widget> Function() builder,
 ) async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   // Raw fallback for errors before DI is ready
   FlutterError.onError = (details) {
     developer.log(
@@ -18,7 +20,7 @@ Future<void> bootstrap(
     );
   };
 
-  initDependencies();
+  await initDependencies();
 
   final logger = sl<AppLogger>();
   final errorReporter = sl<ErrorReporter>();

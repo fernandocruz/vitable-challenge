@@ -4,6 +4,7 @@ import 'package:health_copilot/features/appointments/domain/entities/appointment
 extension AppointmentMapper on AppointmentModel {
   Appointment toEntity() => Appointment(
         id: id,
+        patientName: patientName,
         doctorName: doctorName,
         specialtyName: specialtyName,
         startTime: startTime,

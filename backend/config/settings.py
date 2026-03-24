@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
     'copilot',
     'scheduling',
@@ -131,8 +132,23 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 }
 
 # AI Service
 AI_SERVICE_BACKEND = 'mock'  # 'mock' or 'claude'
 ANTHROPIC_API_KEY = ''
+
+# OTP Configuration
+import os
+OTP_SETTINGS = {
+    'CODE_LENGTH': 6,
+    'EXPIRY_MINUTES': 10,
+    'MAX_PER_HOUR': 5,
+    # 'console' — dev: print + include in response
+    # 'email'   — prod: send_mail, never in response
+    # 'fixed'   — CI/test: always "111111", in response
+    'BACKEND': os.environ.get('OTP_BACKEND', 'console'),
+}

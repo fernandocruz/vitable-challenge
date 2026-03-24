@@ -7,6 +7,7 @@ abstract class AppointmentRepository {
     required int timeSlotId,
     required String symptomsSummary,
     required String urgencyLevel,
+    int? patientId,
   });
 
   Future<List<Appointment>> getAppointments();

@@ -12,6 +12,7 @@ class CreateAppointment {
     required int timeSlotId,
     required String symptomsSummary,
     required String urgencyLevel,
+    int? patientId,
   }) =>
       _repository.createAppointment(
         conversationId: conversationId,
@@ -19,5 +20,6 @@ class CreateAppointment {
         timeSlotId: timeSlotId,
         symptomsSummary: symptomsSummary,
         urgencyLevel: urgencyLevel,
+        patientId: patientId,
       );
 }

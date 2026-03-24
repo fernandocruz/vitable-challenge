@@ -81,6 +81,7 @@ class SchedulingCubit extends Cubit<SchedulingState> {
     required int? conversationId,
     required String symptomsSummary,
     required String urgencyLevel,
+    int? patientId,
   }) async {
     if (state.selectedDoctor == null) return null;
     try {
@@ -90,6 +91,7 @@ class SchedulingCubit extends Cubit<SchedulingState> {
         timeSlotId: timeSlotId,
         symptomsSummary: symptomsSummary,
         urgencyLevel: urgencyLevel,
+        patientId: patientId,
       );
     } catch (e) {
       emit(

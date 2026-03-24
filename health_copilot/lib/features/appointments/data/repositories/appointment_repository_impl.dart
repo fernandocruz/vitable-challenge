@@ -17,6 +17,7 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     required int timeSlotId,
     required String symptomsSummary,
     required String urgencyLevel,
+    int? patientId,
   }) async {
     final model = await _dataSource.createAppointment(
       conversationId: conversationId,
@@ -24,6 +25,7 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
       timeSlotId: timeSlotId,
       symptomsSummary: symptomsSummary,
       urgencyLevel: urgencyLevel,
+      patientId: patientId,
     );
     return model.toEntity();
   }

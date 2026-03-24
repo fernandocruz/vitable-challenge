@@ -37,6 +37,35 @@ class Message(models.Model):
         return f'[{self.role}] {self.content[:50]}'
 
 
+class Patient(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=20)
+    date_of_birth = models.DateField()
+    is_verified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.name} ({self.email})'
+
+
+class OtpCode(models.Model):
+    email = models.EmailField()
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'OTP for {self.email}'
+
+
 class Appointment(models.Model):
     URGENCY_CHOICES = [
         ('low', 'Low'),
@@ -49,6 +78,13 @@ class Appointment(models.Model):
         ('cancelled', 'Cancelled'),
     ]
 
+    patient = models.ForeignKey(
+        Patient,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='appointments',
+    )
     conversation = models.ForeignKey(
         Conversation,
         on_delete=models.SET_NULL,
