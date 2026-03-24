@@ -323,6 +323,45 @@ These reviews improved the codebase significantly and demonstrated the value of 
 
 ---
 
+## Phase 9: Security Audit and Remediation
+
+### Prompt
+
+> "Act as a Staff Security Engineer and perform a thorough security review of the codebase against the OWASP Top 10."
+
+### Audit Process
+
+Two parallel security-focused explorations were conducted: one on the Django backend (views, models, serializers, services, settings) and one on the Flutter app (API client, auth interceptor, token storage, form validation, logging). Findings were mapped to OWASP Top 10 categories.
+
+### Key Findings (16 total, prioritized by severity)
+
+| # | OWASP Category | Severity | Issue |
+|---|---------------|----------|-------|
+| 1 | A02 Cryptographic | CRITICAL | Hardcoded SECRET_KEY in source |
+| 2 | A01 Access Control | CRITICAL | Unauthenticated appointment creation |
+| 3 | A02 Cryptographic | CRITICAL | HTTP transport (no TLS) |
+| 4 | A02 Cryptographic | CRITICAL | Token in SharedPreferences (unencrypted) |
+| 5 | A07 Auth Failures | HIGH | OTP brute-force (no attempt limiting) |
+| 6 | A01 Access Control | HIGH | Conversations accessible without auth |
+| 7 | A03 Injection | HIGH | Prompt injection via AI service |
+| 8 | A05 Misconfiguration | HIGH | DEBUG=True, CORS_ALLOW_ALL |
+
+### Fixes Implemented (Items 1-7)
+
+1. **SECRET_KEY from env var** — `os.environ.get('DJANGO_SECRET_KEY', fallback)` with dev-only fallback
+2. **Appointment auth** — `IsAuthenticated` for all actions, patient set server-side from `request.user` (not from request body)
+3. **OTP brute-force protection** — 5-attempt limit per OTP code, `hmac.compare_digest()` for constant-time comparison, attempt counter in OtpCode model
+4. **HTTPS documentation** — production must use HTTPS with certificate pinning (documented in api_client.dart)
+5. **flutter_secure_storage** — replaced SharedPreferences with encrypted Keychain/EncryptedSharedPreferences for auth token
+6. **Conversation auth** — retrieve requires `IsAuthenticated`
+7. **Input length limits** — `max_length=2000` on messages, `min_length=6, max_length=6` on OTP code, `patient` field made read-only in AppointmentSerializer
+
+### Testing Impact
+
+Backend tests updated to reflect new auth requirements: appointment creation and conversation retrieval now require authentication tokens. Test count increased from 54 to 56.
+
+---
+
 ## Tools and Workflow
 
 - **Claude Code CLI** (Claude Opus 4.6, 1M context) — AI pair programmer

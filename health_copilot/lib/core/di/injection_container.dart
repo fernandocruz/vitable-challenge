@@ -1,3 +1,4 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:health_copilot/core/api/api_client.dart';
 import 'package:health_copilot/core/api/auth_interceptor.dart';
@@ -35,6 +36,9 @@ Future<void> initDependencies() async {
   final prefs = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => prefs);
 
+  const secureStorage = FlutterSecureStorage();
+  sl.registerLazySingleton(() => secureStorage);
+
   _initObservability();
   _initCore();
   _initAuth();
@@ -60,7 +64,7 @@ void _initCore() {
   sl.registerLazySingleton(
     () => ApiClient(
       interceptors: [
-        AuthInterceptor(prefs: sl()),
+        AuthInterceptor(secureStorage: sl()),
         ObservabilityInterceptor(
           logger: sl(),
           errorReporter: sl(),
@@ -78,7 +82,7 @@ void _initAuth() {
     ..registerLazySingleton<AuthRepository>(
       () => AuthRepositoryImpl(
         dataSource: sl(),
-        prefs: sl(),
+        secureStorage: sl(),
       ),
     )
     ..registerLazySingleton(() => RegisterPatient(sl()))

@@ -58,6 +58,7 @@ class OtpCode(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
     is_used = models.BooleanField(default=False)
+    attempts = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['-created_at']

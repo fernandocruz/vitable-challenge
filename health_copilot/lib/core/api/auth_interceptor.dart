@@ -1,20 +1,22 @@
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class AuthInterceptor extends Interceptor {
-  AuthInterceptor({required SharedPreferences prefs})
-      : _prefs = prefs;
+class AuthInterceptor extends QueuedInterceptor {
+  AuthInterceptor({
+    required FlutterSecureStorage secureStorage,
+  }) : _secureStorage = secureStorage;
 
-  final SharedPreferences _prefs;
+  final FlutterSecureStorage _secureStorage;
 
   static const _tokenKey = 'auth_token';
 
   @override
-  void onRequest(
+  Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
-  ) {
-    final token = _prefs.getString(_tokenKey);
+  ) async {
+    final token =
+        await _secureStorage.read(key: _tokenKey);
     if (token != null) {
       options.headers['Authorization'] = 'Token $token';
     }

@@ -1,18 +1,18 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:health_copilot/features/auth/data/datasource/auth_remote_data_source.dart';
 import 'package:health_copilot/features/auth/data/mappers/patient_mapper.dart';
 import 'package:health_copilot/features/auth/domain/entities/patient.dart';
 import 'package:health_copilot/features/auth/domain/repositories/auth_repository.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({
     required AuthRemoteDataSource dataSource,
-    required SharedPreferences prefs,
+    required FlutterSecureStorage secureStorage,
   })  : _dataSource = dataSource,
-        _prefs = prefs;
+        _secureStorage = secureStorage;
 
   final AuthRemoteDataSource _dataSource;
-  final SharedPreferences _prefs;
+  final FlutterSecureStorage _secureStorage;
 
   static const _tokenKey = 'auth_token';
 
@@ -63,12 +63,16 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> saveToken(String token) =>
-      _prefs.setString(_tokenKey, token);
+      _secureStorage.write(
+        key: _tokenKey,
+        value: token,
+      );
 
   @override
-  Future<String?> getStoredToken() async =>
-      _prefs.getString(_tokenKey);
+  Future<String?> getStoredToken() =>
+      _secureStorage.read(key: _tokenKey);
 
   @override
-  Future<void> clearToken() => _prefs.remove(_tokenKey);
+  Future<void> clearToken() =>
+      _secureStorage.delete(key: _tokenKey);
 }

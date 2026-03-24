@@ -19,6 +19,9 @@ class ApiClient {
     }
   }
 
+  // SECURITY: Development only. Production MUST use
+  // HTTPS with certificate pinning. Configure the
+  // production URL via flavor-specific config.
   static String get _defaultBaseUrl {
     if (Platform.isAndroid) {
       return 'http://10.0.2.2:8000/api';

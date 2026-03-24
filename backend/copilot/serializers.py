@@ -27,7 +27,7 @@ class ConversationCreateSerializer(serializers.ModelSerializer):
 
 
 class SendMessageSerializer(serializers.Serializer):
-    content = serializers.CharField()
+    content = serializers.CharField(max_length=2000)
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -58,7 +58,7 @@ class SendOtpSerializer(serializers.Serializer):
 
 class VerifyOtpSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    code = serializers.CharField(max_length=6)
+    code = serializers.CharField(min_length=6, max_length=6)
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
@@ -90,4 +90,4 @@ class AppointmentSerializer(serializers.ModelSerializer):
             'status',
             'created_at',
         ]
-        read_only_fields = ['id', 'status', 'created_at']
+        read_only_fields = ['id', 'patient', 'status', 'created_at']

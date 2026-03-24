@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -19,8 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-5*bkjrb2zx+*4!m57i(&g63@n6ej&r0*rgd5&ohv&a1i1j)tis'
+# SECURITY: Production MUST set DJANGO_SECRET_KEY env var.
+# The fallback is for local development only.
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-dev-only-do-not-use-in-production',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -142,7 +147,6 @@ AI_SERVICE_BACKEND = 'mock'  # 'mock' or 'claude'
 ANTHROPIC_API_KEY = ''
 
 # OTP Configuration
-import os
 OTP_SETTINGS = {
     'CODE_LENGTH': 6,
     'EXPIRY_MINUTES': 10,

@@ -19,7 +19,6 @@ class AppointmentRemoteDataSource {
         await _apiClient.post<Map<String, dynamic>>(
       '/copilot/appointments/',
       data: {
-        'patient': patientId,
         'conversation': conversationId,
         'doctor': doctorId,
         'time_slot': timeSlotId,

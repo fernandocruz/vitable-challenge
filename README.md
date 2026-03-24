@@ -198,6 +198,8 @@ vitable/
 | `67c057c` | Patient authentication with OTP verification (passwordless) |
 | `fdc162b` | My Appointments flow with auth-gated access |
 | `2a8f0ad` | README and AI-assisted development process documentation |
+| `56b47e6` | Backend test suite (54 tests) |
+| `dc2db83` | Flutter cubit tests (27 tests) |
 
 ## Built With AI
 

@@ -97,22 +97,45 @@ class SendOtpView(APIView):
 
 
 class VerifyOtpView(APIView):
+    MAX_OTP_ATTEMPTS = 5
+
     def post(self, request):
+        import hmac
+
         serializer = VerifyOtpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
         code = serializer.validated_data['code']
 
+        # Get the latest non-used, non-expired OTP
         try:
             otp = OtpCode.objects.filter(
                 email=email,
-                code=code,
                 is_used=False,
                 expires_at__gt=timezone.now(),
             ).latest('created_at')
         except OtpCode.DoesNotExist:
             return Response(
                 {'error': 'Invalid or expired OTP.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Check attempt limit
+        if otp.attempts >= self.MAX_OTP_ATTEMPTS:
+            otp.is_used = True
+            otp.save()
+            return Response(
+                {'error': 'Too many failed attempts. Request a new OTP.'},
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+
+        # Constant-time comparison
+        if not hmac.compare_digest(otp.code, code):
+            otp.attempts += 1
+            otp.save()
+            remaining = self.MAX_OTP_ATTEMPTS - otp.attempts
+            return Response(
+                {'error': f'Invalid OTP. {remaining} attempts remaining.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -161,6 +184,11 @@ class ConversationViewSet(viewsets.GenericViewSet):
         if self.action == 'create':
             return ConversationCreateSerializer
         return ConversationSerializer
+
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return [IsAuthenticated()]
+        return super().get_permissions()
 
     def retrieve(self, request, pk=None):
         conversation = self.get_object()
@@ -226,21 +254,22 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         'doctor', 'doctor__specialty', 'time_slot', 'patient'
     )
     serializer_class = AppointmentSerializer
+    permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post']
-
-    def get_permissions(self):
-        if self.action == 'list':
-            return [IsAuthenticated()]
-        return super().get_permissions()
 
     def get_queryset(self):
         qs = super().get_queryset()
-        if self.action == 'list' and self.request.user.is_authenticated:
-            qs = qs.filter(patient__email=self.request.user.username)
+        if self.request.user.is_authenticated:
+            qs = qs.filter(
+                patient__email=self.request.user.username,
+            )
         return qs
 
     def perform_create(self, serializer):
-        appointment = serializer.save()
+        patient = Patient.objects.get(
+            email=self.request.user.username,
+        )
+        appointment = serializer.save(patient=patient)
         time_slot = appointment.time_slot
         time_slot.is_available = False
         time_slot.save()

@@ -215,7 +215,16 @@ class TestConversationAPI(TestCase):
         self.assertEqual(len(data['messages']), 1)
         self.assertEqual(data['messages'][0]['role'], 'assistant')
 
-    def test_retrieve_conversation(self):
+    def test_retrieve_conversation_requires_auth(self):
+        resp = self.client.post('/api/copilot/conversations/')
+        cid = resp.json()['id']
+        resp = self.client.get(f'/api/copilot/conversations/{cid}/')
+        self.assertEqual(resp.status_code, 401)
+
+    def test_retrieve_conversation_with_auth(self):
+        user = User.objects.create_user(username='a@t.com')
+        token = Token.objects.create(user=user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
         resp = self.client.post('/api/copilot/conversations/')
         cid = resp.json()['id']
         resp = self.client.get(f'/api/copilot/conversations/{cid}/')
@@ -437,11 +446,26 @@ class TestAppointmentAPI(TestCase):
         self.user = User.objects.create_user(username='a@test.com', email='a@test.com')
         self.token = Token.objects.create(user=self.user)
 
-    def test_create_appointment_marks_slot_unavailable(self):
+    def test_create_appointment_requires_auth(self):
         resp = self.client.post(
             '/api/copilot/appointments/',
             {
-                'patient': self.patient.id,
+                'doctor': self.doctor.id,
+                'time_slot': self.slot.id,
+                'symptoms_summary': 'headaches',
+                'urgency_level': 'medium',
+            },
+            format='json',
+        )
+        self.assertEqual(resp.status_code, 401)
+
+    def test_create_appointment_marks_slot_unavailable(self):
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f'Token {self.token.key}',
+        )
+        resp = self.client.post(
+            '/api/copilot/appointments/',
+            {
                 'doctor': self.doctor.id,
                 'time_slot': self.slot.id,
                 'symptoms_summary': 'headaches',
@@ -452,6 +476,9 @@ class TestAppointmentAPI(TestCase):
         self.assertEqual(resp.status_code, 201)
         self.slot.refresh_from_db()
         self.assertFalse(self.slot.is_available)
+        # Patient set from authenticated user, not request body
+        appt = Appointment.objects.first()
+        self.assertEqual(appt.patient, self.patient)
 
     def test_list_requires_auth(self):
         resp = self.client.get('/api/copilot/appointments/')
