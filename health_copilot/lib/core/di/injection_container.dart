@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:health_copilot/core/api/api_client.dart';
+import 'package:health_copilot/core/observability/observability.dart';
 import 'package:health_copilot/features/appointments/data/datasource/appointment_remote_data_source.dart';
 import 'package:health_copilot/features/appointments/data/repositories/appointment_repository_impl.dart';
 import 'package:health_copilot/features/appointments/domain/repositories/appointment_repository.dart';
@@ -21,14 +22,37 @@ import 'package:health_copilot/features/scheduling/domain/usecases/get_specialti
 final sl = GetIt.instance;
 
 void initDependencies() {
+  _initObservability();
   _initCore();
   _initChat();
   _initScheduling();
   _initAppointments();
 }
 
+void _initObservability() {
+  sl
+    ..registerLazySingleton<AppLogger>(
+      ConsoleLogger.new,
+    )
+    ..registerLazySingleton<ErrorReporter>(
+      NoopErrorReporter.new,
+    )
+    ..registerLazySingleton<EventTracker>(
+      NoopEventTracker.new,
+    );
+}
+
 void _initCore() {
-  sl.registerLazySingleton(ApiClient.new);
+  sl.registerLazySingleton(
+    () => ApiClient(
+      interceptors: [
+        ObservabilityInterceptor(
+          logger: sl(),
+          errorReporter: sl(),
+        ),
+      ],
+    ),
+  );
 }
 
 void _initChat() {

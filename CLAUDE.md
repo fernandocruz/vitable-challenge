@@ -93,6 +93,18 @@ core/design_system/
 
 Tokens are `abstract final class` with static const members. Use `AppSpacing` for all spacing/radii, `AppColors` for semantic colors (urgency, success, shadow), `AppIcons` for the icon set (all `_rounded` variant). Standard text styles use `Theme.of(context).textTheme`; only non-standard sizes live in `AppTypography`.
 
+**Observability**: Ports and Adapters in `core/observability/`, imported via `observability.dart`:
+
+```
+core/observability/
+├── ports/        # AppLogger, ErrorReporter, EventTracker, AppUser
+├── adapters/     # ConsoleLogger, NoopErrorReporter, NoopEventTracker
+├── interceptors/ # ObservabilityInterceptor (Dio HTTP logging)
+└── observers/    # ObservabilityBlocObserver (Bloc state/error logging)
+```
+
+`AppLogger` uses Template Method pattern — adapters override only `log()`. All methods accept `tag` for filtering (e.g., `'HTTP'`, `'Bloc'`). `ErrorReporter` covers both fatal and non-fatal errors. `EventTracker` is for analytics events tracked at business call sites (cubits), NOT in BlocObserver. All ports registered in `_initObservability()` in `injection_container.dart` before other registrations. Vendor adapters (Sentry, Crashlytics, Mixpanel) are swapped via DI without changing app code.
+
 **Linting**: `very_good_analysis` — strict rules including 80-char line length.
 
 **Localization**: ARB-based (en, es) with pre-generated files in `lib/l10n/arb/`. Imported from `package:health_copilot/l10n/arb/app_localizations.dart` (not flutter_gen).

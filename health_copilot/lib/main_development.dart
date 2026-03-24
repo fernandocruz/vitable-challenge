@@ -1,6 +1,6 @@
 import 'package:health_copilot/app/app.dart';
 import 'package:health_copilot/bootstrap.dart';
 
-void main() {
-  bootstrap(() => const App());
+Future<void> main() async {
+  await bootstrap(() => const App());
 }
