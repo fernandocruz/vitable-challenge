@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_copilot/core/design_system/design_system.dart';
 import 'package:health_copilot/features/appointments/presentation/view/confirmation_page.dart';
 import 'package:health_copilot/features/chat/domain/entities/recommendation.dart';
 import 'package:health_copilot/features/scheduling/domain/entities/doctor.dart';
@@ -27,57 +28,73 @@ class SlotPickerPage extends StatelessWidget {
       ),
       body: BlocBuilder<SchedulingCubit, SchedulingState>(
         builder: (context, state) {
-          if (state.status == SchedulingStatus.loading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (state.slots.isEmpty) {
-            return const Center(
-              child: Text('No available slots'),
-            );
-          }
+          return AsyncContent(
+            isLoading:
+                state.status == SchedulingStatus.loading,
+            isEmpty: state.status ==
+                    SchedulingStatus.loaded &&
+                state.slots.isEmpty,
+            emptyMessage: 'No available slots',
+            emptyIcon: AppIcons.calendar,
+            contentBuilder: (_) {
+              final grouped = <String, List<TimeSlot>>{};
+              for (final slot in state.slots) {
+                final dateKey = DateFormat('EEEE, MMM d')
+                    .format(slot.startTime);
+                grouped
+                    .putIfAbsent(dateKey, () => [])
+                    .add(slot);
+              }
 
-          final grouped = <String, List<TimeSlot>>{};
-          for (final slot in state.slots) {
-            final dateKey =
-                DateFormat('EEEE, MMM d').format(slot.startTime);
-            grouped.putIfAbsent(dateKey, () => []).add(slot);
-          }
+              return ListView.builder(
+                padding: const EdgeInsets.all(
+                  AppSpacing.lg,
+                ),
+                itemCount: grouped.length,
+                itemBuilder: (context, index) {
+                  final dateKey =
+                      grouped.keys.elementAt(index);
+                  final slots = grouped[dateKey]!;
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: grouped.length,
-            itemBuilder: (context, index) {
-              final dateKey = grouped.keys.elementAt(index);
-              final slots = grouped[dateKey]!;
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 8),
-                    child: Text(
-                      dateKey,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: slots.map((slot) {
-                      return _SlotChip(
-                        slot: slot,
-                        onTap: () => _bookSlot(context, slot),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-                ],
+                  return Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding:
+                            const EdgeInsets.symmetric(
+                          vertical: AppSpacing.sm,
+                        ),
+                        child: Text(
+                          dateKey,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(
+                                fontWeight:
+                                    AppTypography.bold,
+                              ),
+                        ),
+                      ),
+                      Wrap(
+                        spacing: AppSpacing.sm,
+                        runSpacing: AppSpacing.sm,
+                        children: slots.map((slot) {
+                          return _SlotChip(
+                            slot: slot,
+                            onTap: () => _bookSlot(
+                              context,
+                              slot,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(
+                        height: AppSpacing.lg,
+                      ),
+                    ],
+                  );
+                },
               );
             },
           );
@@ -111,7 +128,10 @@ class SlotPickerPage extends StatelessWidget {
 }
 
 class _SlotChip extends StatelessWidget {
-  const _SlotChip({required this.slot, required this.onTap});
+  const _SlotChip({
+    required this.slot,
+    required this.onTap,
+  });
 
   final TimeSlot slot;
   final VoidCallback onTap;
@@ -119,12 +139,13 @@ class _SlotChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final time = DateFormat('h:mm a').format(slot.startTime);
+    final time =
+        DateFormat('h:mm a').format(slot.startTime);
 
     return ActionChip(
       label: Text(time),
       avatar: Icon(
-        Icons.access_time_rounded,
+        AppIcons.time,
         size: 18,
         color: colorScheme.primary,
       ),

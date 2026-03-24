@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_copilot/core/design_system/design_system.dart';
 import 'package:health_copilot/core/di/injection_container.dart';
 import 'package:health_copilot/features/chat/presentation/cubit/chat_cubit.dart';
 import 'package:health_copilot/features/chat/presentation/widgets/chat_input.dart';
@@ -33,14 +34,14 @@ class _ChatView extends StatelessWidget {
         title: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.health_and_safety_rounded),
-            SizedBox(width: 8),
+            Icon(AppIcons.health),
+            SizedBox(width: AppSpacing.sm),
             Text('Health Copilot'),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded),
+            icon: const Icon(AppIcons.refresh),
             onPressed: () =>
                 context.read<ChatCubit>().resetConversation(),
             tooltip: 'New conversation',
@@ -59,9 +60,7 @@ class _ChatView extends StatelessWidget {
         builder: (context, state) {
           if (state.status == ChatStatus.initial ||
               state.status == ChatStatus.loading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const AppLoader();
           }
 
           return Column(
@@ -111,7 +110,9 @@ class _MessageList extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       reverse: true,
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.sm,
+      ),
       itemCount: state.messages.length +
           (state.status == ChatStatus.sending ? 1 : 0),
       itemBuilder: (context, index) {

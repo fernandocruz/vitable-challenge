@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:health_copilot/core/design_system/design_system.dart';
 
 class AppTheme {
-  static const _primaryColor = Color(0xFF1A73E8);
-  static const _secondaryColor = Color(0xFF34A853);
-
   static ThemeData get light => ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: _primaryColor,
+        colorSchemeSeed: AppColors.primary,
         brightness: Brightness.light,
         appBarTheme: const AppBarTheme(
           centerTitle: true,
@@ -15,26 +13,37 @@ class AppTheme {
         cardTheme: CardThemeData(
           elevation: 1,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(
+              AppSpacing.radiusLg,
+            ),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(
+              AppSpacing.radiusPill,
+            ),
           ),
           filled: true,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(
+                AppSpacing.radiusLg,
+              ),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.xxl,
+              vertical: AppSpacing.md,
+            ),
           ),
         ),
       );
 
-  static const secondaryColor = _secondaryColor;
+  static const secondaryColor = AppColors.secondary;
 }

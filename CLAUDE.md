@@ -80,6 +80,19 @@ features/<feature>/
 
 **API client**: `core/api/api_client.dart` uses Dio with platform-aware base URL (Android emulator: `10.0.2.2:8000`, iOS/macOS: `localhost:8000`).
 
+**Design System**: Atomic Design in `core/design_system/`, imported via single barrel `design_system.dart`:
+
+```
+core/design_system/
+├── tokens/    # AppColors, AppSpacing, AppTypography, AppIcons
+├── atoms/     # AppButton, AppTextField, AppBadge, AppAvatar, AppLoader
+├── molecules/ # InfoRow, DetailRow, InputWithAction
+├── organisms/ # InfoCard, ListTileCard
+└── templates/ # AsyncContent (loading/error/empty/content wrapper)
+```
+
+Tokens are `abstract final class` with static const members. Use `AppSpacing` for all spacing/radii, `AppColors` for semantic colors (urgency, success, shadow), `AppIcons` for the icon set (all `_rounded` variant). Standard text styles use `Theme.of(context).textTheme`; only non-standard sizes live in `AppTypography`.
+
 **Linting**: `very_good_analysis` — strict rules including 80-char line length.
 
 **Localization**: ARB-based (en, es) with pre-generated files in `lib/l10n/arb/`. Imported from `package:health_copilot/l10n/arb/app_localizations.dart` (not flutter_gen).

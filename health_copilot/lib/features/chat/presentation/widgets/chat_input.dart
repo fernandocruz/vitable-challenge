@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:health_copilot/core/design_system/design_system.dart';
 
 class ChatInput extends StatefulWidget {
   const ChatInput({
@@ -32,47 +33,12 @@ class _ChatInputState extends State<ChatInput> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _controller,
-                enabled: widget.enabled,
-                textInputAction: TextInputAction.send,
-                onSubmitted: (_) => _handleSend(),
-                decoration: const InputDecoration(
-                  hintText: 'Describe your symptoms...',
-                  border: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.all(Radius.circular(24)),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            IconButton.filled(
-              onPressed: widget.enabled ? _handleSend : null,
-              icon: const Icon(Icons.send_rounded),
-            ),
-          ],
-        ),
-      ),
+    return InputWithAction(
+      controller: _controller,
+      onAction: _handleSend,
+      hintText: 'Describe your symptoms...',
+      enabled: widget.enabled,
+      onSubmitted: (_) => _handleSend(),
     );
   }
 }

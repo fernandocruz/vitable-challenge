@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:health_copilot/core/design_system/design_system.dart';
 
 class TypingIndicator extends StatefulWidget {
   const TypingIndicator({super.key});
 
   @override
-  State<TypingIndicator> createState() => _TypingIndicatorState();
+  State<TypingIndicator> createState() =>
+      _TypingIndicatorState();
 }
 
 class _TypingIndicatorState extends State<TypingIndicator>
@@ -34,20 +36,22 @@ class _TypingIndicatorState extends State<TypingIndicator>
       alignment: Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(
-          vertical: 4,
-          horizontal: 16,
+          vertical: AppSpacing.xs,
+          horizontal: AppSpacing.lg,
         ),
         padding: const EdgeInsets.symmetric(
-          vertical: 12,
-          horizontal: 16,
+          vertical: AppSpacing.md,
+          horizontal: AppSpacing.lg,
         ),
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-            bottomLeft: Radius.circular(4),
-            bottomRight: Radius.circular(16),
+            topLeft: Radius.circular(AppSpacing.radiusXl),
+            topRight: Radius.circular(AppSpacing.radiusXl),
+            bottomLeft:
+                Radius.circular(AppSpacing.radiusSm),
+            bottomRight:
+                Radius.circular(AppSpacing.radiusXl),
           ),
         ),
         child: AnimatedBuilder(
@@ -58,16 +62,21 @@ class _TypingIndicatorState extends State<TypingIndicator>
               children: List.generate(3, (i) {
                 final delay = i * 0.2;
                 final value =
-                    ((_controller.value + delay) % 1.0 * 2 - 1)
+                    ((_controller.value + delay) % 1.0 *
+                                2 -
+                            1)
                         .abs();
                 return Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 2),
-                  width: 8,
-                  height: 8,
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xxs,
+                  ),
+                  width: AppSpacing.sm,
+                  height: AppSpacing.sm,
                   decoration: BoxDecoration(
                     color: colorScheme.onSurfaceVariant
-                        .withValues(alpha: 0.3 + value * 0.7),
+                        .withValues(
+                      alpha: 0.3 + value * 0.7,
+                    ),
                     shape: BoxShape.circle,
                   ),
                 );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:health_copilot/core/design_system/design_system.dart';
 import 'package:health_copilot/features/chat/domain/entities/recommendation.dart';
 
 class RecommendationCard extends StatelessWidget {
@@ -11,28 +12,14 @@ class RecommendationCard extends StatelessWidget {
   final Recommendation recommendation;
   final VoidCallback onFindDoctor;
 
-  Color _urgencyColor(String urgency) {
-    switch (urgency) {
-      case 'high':
-        return Colors.red;
-      case 'medium':
-        return Colors.orange;
-      default:
-        return Colors.green;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final urgencyColor = _urgencyColor(recommendation.urgency);
-
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(AppSpacing.lg),
       child: Card(
         elevation: 3,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -40,98 +27,54 @@ class RecommendationCard extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                    Icons.medical_services_rounded,
-                    color: colorScheme.primary,
+                    AppIcons.medical,
+                    color:
+                        Theme.of(context).colorScheme.primary,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Text(
                     'Recommendation',
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                        ?.copyWith(
+                          fontWeight: AppTypography.bold,
+                        ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              _InfoRow(
+              const SizedBox(height: AppSpacing.md),
+              InfoRow(
                 label: 'Specialty',
                 value: recommendation.specialty,
-                icon: Icons.local_hospital_rounded,
+                icon: AppIcons.hospital,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               Row(
                 children: [
-                  const Icon(
-                    Icons.warning_amber_rounded,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
+                  const Icon(AppIcons.warning, size: 18),
+                  const SizedBox(width: AppSpacing.sm),
                   const Text('Urgency: '),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: urgencyColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      recommendation.urgency.toUpperCase(),
-                      style: TextStyle(
-                        color: urgencyColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
+                  AppBadge(
+                    label: recommendation.urgency
+                        .toUpperCase(),
+                    color: AppColors.urgencyColor(
+                      recommendation.urgency,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: onFindDoctor,
-                  icon: const Icon(Icons.search_rounded),
-                  label: const Text('Find a Doctor'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
-                  ),
-                ),
+              const SizedBox(height: AppSpacing.lg),
+              AppButton(
+                label: 'Find a Doctor',
+                onPressed: onFindDoctor,
+                icon: AppIcons.search,
+                isExpanded: true,
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
-
-  final String label;
-  final String value;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 18),
-        const SizedBox(width: 8),
-        Text('$label: '),
-        Text(
-          value,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ],
     );
   }
 }

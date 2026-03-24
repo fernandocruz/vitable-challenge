@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:health_copilot/core/design_system/design_system.dart';
 import 'package:health_copilot/features/chat/domain/entities/message.dart';
 
 class MessageBubble extends StatelessWidget {
@@ -19,8 +20,8 @@ class MessageBubble extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         margin: const EdgeInsets.symmetric(
-          vertical: 4,
-          horizontal: 16,
+          vertical: AppSpacing.xs,
+          horizontal: AppSpacing.lg,
         ),
         padding: const EdgeInsets.symmetric(
           vertical: 10,
@@ -31,10 +32,16 @@ class MessageBubble extends StatelessWidget {
               ? colorScheme.primary
               : colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: Radius.circular(isUser ? 16 : 4),
-            bottomRight: Radius.circular(isUser ? 4 : 16),
+            topLeft:
+                const Radius.circular(AppSpacing.radiusXl),
+            topRight:
+                const Radius.circular(AppSpacing.radiusXl),
+            bottomLeft: Radius.circular(
+              isUser ? AppSpacing.radiusXl : AppSpacing.radiusSm,
+            ),
+            bottomRight: Radius.circular(
+              isUser ? AppSpacing.radiusSm : AppSpacing.radiusXl,
+            ),
           ),
         ),
         child: Text(
@@ -43,7 +50,7 @@ class MessageBubble extends StatelessWidget {
             color: isUser
                 ? colorScheme.onPrimary
                 : colorScheme.onSurface,
-            fontSize: 15,
+            fontSize: AppTypography.messageFontSize,
           ),
         ),
       ),
