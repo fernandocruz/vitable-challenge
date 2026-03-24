@@ -292,6 +292,37 @@ These reviews improved the codebase significantly and demonstrated the value of 
 
 ---
 
+## Phase 8: Backend Test Suite
+
+### Prompt
+
+> "Create backend tests for the copilot and scheduling modules. The tests should validate core business logic, API behavior, success and failure scenarios, important edge cases, and regression-prone flows."
+
+### What Was Built
+
+**54 tests** across two test files, all passing:
+
+**scheduling/tests.py** (13 tests):
+- Model tests: str representations, unique name constraint, cascade delete, unique_together (doctor + time), ordering
+- API tests: list/retrieve specialties, list/filter/retrieve doctors, slots action (only available slots returned)
+
+**copilot/tests.py** (41 tests):
+- Model tests: UUID auto-generation, message ordering, unique email, default verified=False
+- MockCopilotService (8 tests): greeting, follow-up questions before recommendation, specialty detection (Neurology from "headache", Cardiology from "chest", Dermatology from "skin", General Practice fallback), urgency levels (high from "severe", low from "mild")
+- OtpService (7 tests): fixed/console/email backends, should_include_in_response behavior, 6-digit code format, DB storage with expiry, rate limiting
+- Conversation API (4 tests): create with greeting, retrieve, send message with AI response, full conversation producing recommendation
+- Patient Auth API (11 tests): register new + update existing, send OTP success + 404, verify OTP success + wrong code + expired + already used, patient me with/without auth, rate limit 429
+- Appointment API (4 tests): create marks slot unavailable, list requires auth, filters by patient only, duplicate time slot fails (OneToOne constraint)
+
+### Key Testing Decisions
+
+- Used `@override_settings(OTP_SETTINGS=OTP_FIXED)` to control OTP backend per test class
+- Used `unittest.mock.patch('builtins.print')` to suppress console output in console backend tests
+- Created helper data (patients, users, tokens) in `setUp()` for auth-dependent tests
+- Tested both success and failure paths for every endpoint
+
+---
+
 ## Tools and Workflow
 
 - **Claude Code CLI** (Claude Opus 4.6, 1M context) — AI pair programmer

@@ -156,15 +156,20 @@ Returning patients skip step 6 (authenticated via stored token).
 ### Running Tests
 
 ```bash
-# Backend
+# Backend (54 tests)
 cd backend && source venv/bin/activate
-python manage.py test
+python manage.py test                              # All tests
+python manage.py test copilot                      # Copilot tests (41)
+python manage.py test scheduling                   # Scheduling tests (13)
+python manage.py test copilot.tests.TestPatientAuthAPI  # Single class
 
 # Flutter
 cd health_copilot
 flutter analyze
 flutter test --coverage --test-randomize-ordering-seed random
 ```
+
+Backend test coverage includes: model constraints, AI service behavior, OTP service backends, all API endpoints (success + failure), auth flows, rate limiting, and appointment booking rules.
 
 ### Project Structure
 
@@ -192,6 +197,7 @@ vitable/
 | `c687382` | Observability with Ports & Adapters (logger, error reporter, event tracker) |
 | `67c057c` | Patient authentication with OTP verification (passwordless) |
 | `fdc162b` | My Appointments flow with auth-gated access |
+| `2a8f0ad` | README and AI-assisted development process documentation |
 
 ## Built With AI
 
