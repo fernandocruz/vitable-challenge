@@ -4,7 +4,7 @@ A patient scheduling copilot that guides users through AI-powered symptom assess
 
 ## Demo
 
-https://github.com/fernandocruz/vitable-challenge/raw/main/docs/demo.mp4
+https://github.com/user-attachments/assets/55be1b29-4b62-49d8-9f95-20ea23efac54
 
 ## Features
 
