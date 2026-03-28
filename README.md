@@ -2,6 +2,10 @@
 
 A patient scheduling copilot that guides users through AI-powered symptom assessment and helps them book doctor visits. Built as a monorepo with a **Django REST** backend and **Flutter** mobile app.
 
+## Demo
+
+https://github.com/fernandocruz/vitable-challenge/raw/main/docs/demo.mp4
+
 ## Features
 
 - **AI Symptom Assessment** — Conversational chat that asks about symptoms, follow-up questions, and recommends a medical specialty with urgency level
